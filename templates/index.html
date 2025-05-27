@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <div class="date-time">
+                <div class="date" id="current-date">Samstag, 24. Mai 2025</div>
+                <div class="time-container">
+                    <div class="time" id="current-time">15:33</div>
+                    <div class="seconds" id="current-seconds">38</div>
+                </div>
+            </div>
+            
+            <div class="calendar-section">
+                <h2>KALENDER</h2>
+                <div class="calendar-entries" id="calendar-entries">
+                    <!-- Kalendereinträge werden hier dynamisch eingefügt -->
+                </div>
+            </div>
+            
+            <div class="news-section">
+                <div class="news-source" id="news-source">Süddeutsche Zeitung, vor einer Stunde</div>
+                <div class="news-headline" id="news-headline">Viechtach: Söder grillt – Peta protestiert</div>
+                <div class="news-content" id="news-content">Markus Söder, eingefleischter Wurstfan, lässt sich das Schweinegrillen in Viechtach nicht entgehen. Während auf dem Rost die Tiere brutzeln, gehen die Protestschilder hoch.</div>
+            </div>
+        </div>
+        
+        <div class="right-panel">
+            <div class="weather-header">AKTUELLES WETTER</div>
+            <div class="weather-current">
+                <div class="weather-info">
+                    <div class="wind-info">
+                        <span class="wind-value" id="wind-value">2</span>
+                        <span class="wind-unit">W</span>
+                    </div>
+                    <div class="time" id="weather-time">21:11</div>
+                </div>
+                <div class="temperature-container">
+                    <div class="weather-icon" id="weather-icon">
+                        <!-- Wettersymbol wird hier dynamisch eingefügt -->
+                    </div>
+                    <div class="temperature">
+                        <span class="temp-value" id="temp-value">17.2</span>
+                        <span class="temp-unit">°</span>
+                    </div>
+                </div>
+                <div class="feels-like" id="feels-like">Gefühlt 17.2°</div>
+            </div>
+            
+            <div class="weather-forecast">
+                <div class="forecast-header">WETTERVORHERSAGE</div>
+                <div class="forecast-days">
+                    <div class="forecast-day">
+                        <div class="day-name">Heute</div>
+                        <div class="day-icon">
+                            <!-- Wettersymbol wird hier dynamisch eingefügt -->
+                        </div>
+                        <div class="day-temp">17.3°</div>
+                        <div class="night-temp">3.9°</div>
+                    </div>
+                    <div class="forecast-day">
+                        <div class="day-name">Morgen</div>
+                        <div class="day-icon">
+                            <!-- Wettersymbol wird hier dynamisch eingefügt -->
+                        </div>
+                        <div class="day-temp">17.2°</div>
+                        <div class="night-temp">10.2°</div>
+                    </div>
+                    <div class="forecast-day">
+                        <div class="day-name">Mo.</div>
+                        <div class="day-icon">
+                            <!-- Wettersymbol wird hier dynamisch eingefügt -->
+                        </div>
+                        <div class="day-temp">18.7°</div>
+                        <div class="night-temp">10.6°</div>
+                    </div>
+                    <div class="forecast-day">
+                        <div class="day-name">Di.</div>
+                        <div class="day-icon">
+                            <!-- Wettersymbol wird hier dynamisch eingefügt -->
+                        </div>
+                        <div class="day-temp">16.5°</div>
+                        <div class="night-temp">7.2°</div>
+                    </div>
+                    <div class="forecast-day">
+                        <div class="day-name">Mi.</div>
+                        <div class="day-icon">
+                            <!-- Wettersymbol wird hier dynamisch eingefügt -->
+                        </div>
+                        <div class="day-temp">23.4°</div>
+                        <div class="night-temp">9.6°</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
