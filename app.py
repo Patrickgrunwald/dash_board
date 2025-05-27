@@ -11,6 +11,7 @@ import time
 import re
 import caldav
 from caldav.elements import dav, cdav
+import xml.etree.ElementTree as ET
 
 app = Flask(__name__)
 
@@ -477,57 +478,54 @@ def get_news_data():
         # Versuche, Nachrichten von einer der Quellen zu erhalten
         for source_url in news_sources:
             try:
-                feed = feedparser.parse(source_url)
-                if feed.entries and len(feed.entries) > 0:
-                    entry = feed.entries[0]  # Nehme den neuesten Eintrag
+                response = requests.get(source_url)
+                if response.status_code == 200:
+                    # Parse XML
+                    root = ET.fromstring(response.content)
                     
-                    # Quelle und Zeitstempel
-                    source_name = feed.feed.title
-                    published_time = entry.get('published', '')
-                    
-                    # Versuche, einen relativen Zeitstempel zu erstellen (z.B. "vor einer Stunde")
-                    time_str = "vor einer Stunde"  # Fallback
-                    if published_time:
-                        try:
-                            # Versuche, den Zeitstempel zu parsen
-                            pub_time = datetime.strptime(published_time, "%a, %d %b %Y %H:%M:%S %z")
-                            now = datetime.now(pub_time.tzinfo)
-                            diff = now - pub_time
+                    # Finde den ersten Eintrag
+                    channel = root.find('channel')
+                    if channel is not None:
+                        item = channel.find('item')
+                        if item is not None:
+                            # Extrahiere Informationen
+                            title = item.find('title').text if item.find('title') is not None else "Kein Titel verfügbar"
+                            description = item.find('description').text if item.find('description') is not None else ""
+                            pub_date = item.find('pubDate').text if item.find('pubDate') is not None else ""
                             
-                            if diff.days > 0:
-                                time_str = f"vor {diff.days} Tagen"
-                            elif diff.seconds // 3600 > 0:
-                                hours = diff.seconds // 3600
-                                time_str = f"vor {hours} Stunde{'n' if hours > 1 else ''}"
-                            elif diff.seconds // 60 > 0:
-                                minutes = diff.seconds // 60
-                                time_str = f"vor {minutes} Minute{'n' if minutes > 1 else ''}"
-                            else:
-                                time_str = "gerade eben"
-                        except:
-                            pass
-                    
-                    # Titel und Inhalt
-                    title = entry.title
-                    
-                    # Inhalt extrahieren und HTML-Tags entfernen
-                    content = entry.get('description', '')
-                    content = re.sub(r'<.*?>', '', content)  # HTML-Tags entfernen
-                    
-                    # Wenn der Inhalt zu kurz ist, versuche andere Felder
-                    if len(content) < 50:
-                        content = entry.get('summary', content)
-                        content = re.sub(r'<.*?>', '', content)  # HTML-Tags entfernen
-                    
-                    # Wenn immer noch zu kurz, verwende einen Standardtext
-                    if len(content) < 50:
-                        content = "Weitere Informationen sind auf der Website der Nachrichtenquelle verfügbar."
-                    
-                    return {
-                        "source": f"{source_name}, {time_str}",
-                        "headline": title,
-                        "content": content
-                    }
+                            # Berechne relative Zeit
+                            time_str = "vor einer Stunde"  # Fallback
+                            if pub_date:
+                                try:
+                                    pub_time = datetime.strptime(pub_date, "%a, %d %b %Y %H:%M:%S %z")
+                                    now = datetime.now(pub_time.tzinfo)
+                                    diff = now - pub_time
+                                    
+                                    if diff.days > 0:
+                                        time_str = f"vor {diff.days} Tagen"
+                                    elif diff.seconds // 3600 > 0:
+                                        hours = diff.seconds // 3600
+                                        time_str = f"vor {hours} Stunde{'n' if hours > 1 else ''}"
+                                    elif diff.seconds // 60 > 0:
+                                        minutes = diff.seconds // 60
+                                        time_str = f"vor {minutes} Minute{'n' if minutes > 1 else ''}"
+                                    else:
+                                        time_str = "gerade eben"
+                                except:
+                                    pass
+                            
+                            # Entferne HTML-Tags
+                            description = re.sub(r'<.*?>', '', description)
+                            
+                            # Wenn der Inhalt zu kurz ist, verwende einen Standardtext
+                            if len(description) < 50:
+                                description = "Weitere Informationen sind auf der Website der Nachrichtenquelle verfügbar."
+                            
+                            return {
+                                "source": f"{channel.find('title').text}, {time_str}",
+                                "headline": title,
+                                "content": description
+                            }
             except Exception as e:
                 print(f"Fehler beim Abrufen von {source_url}: {e}")
                 continue
